@@ -1,0 +1,29 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}This is web app {% endblock %}
+
+{% block content %}
+{{wtf.quick_form(form, method='post', enctype="multipart/form-data", action="/")}}
+
+<h2> Yours photos:</h2>
+
+<div>
+    <img src={{image_first}} class="img-rounded" alt="First Image" width=224, height=224/>
+    <img src={{image_second}} class="img-rounded" alt="Second Image" width=224, height=224/>
+</div>
+
+<h2> Result Photo: </h2>
+<div>
+    <img src={{image_result}} class="img-rounded" alt="Result Image" width=224, height=224/>
+</div>
+
+<h2>Сolor distribution: </h2>
+<div>
+    <img src={{gist_first}} class="img-rounded" alt="First Image" width=300, height=300/>
+    <img src={{gist_second}} class="img-rounded" alt="Second Image" width=300, height=300/>
+    <img src={{gist_result}} class="img-rounded" alt="Second Image" width=300, height=300/>
+</div>
+
+
+{% endblock %}
