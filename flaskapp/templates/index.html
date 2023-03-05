@@ -1,10 +1,41 @@
 {% extends "bootstrap/base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}This is web app {% endblock %}
 
 {% block content %}
-{{wtf.quick_form(form, method='post', enctype="multipart/form-data", action="/")}}
+<form method="post" action="/" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    <p>
+        {{ form.upload_first.label }}
+        {{ form.upload_first() }}
+    </p>
+    {% if form.upload_first.errors %}
+        <ul class="errors">
+            {% for error in form.upload_first.errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <p>
+        {{ form.upload_second.label }}
+        {{ form.upload_second() }}
+    </p>
+    {% if form.upload_second.errors %}
+        <ul class="errors">
+            {% for error in form.upload_second.errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <p>
+        {{ form.mix_ratio.label }}
+        {{ form.mix_ratio(min=0, max=1) }}
+    </p>
+        {{ form.recaptcha() }}
+    <p>
+        {{ form.submit() }}
+    </p>
+</form>
 
 <h2> Yours photos:</h2>
 
