@@ -1,10 +1,12 @@
+import decimal
+
 from flask import Flask
 from flask import render_template
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from flask_bootstrap import Bootstrap
-from wtforms import SubmitField, FloatField
-from wtforms.validators import NumberRange
+from wtforms import SubmitField
+from wtforms.fields import DecimalRangeField
 from werkzeug.utils import secure_filename
 import utils
 
@@ -20,14 +22,14 @@ app.config['RECAPTCHA_PRIVATE_KEY'] = '6LfJlHIkAAAAAIqxAa6o2TKo_JrPLHrQ2x1vFylN'
 app.config['RECAPTCHA_OPTIONS'] = {'theme': 'white'}
 bootstrap = Bootstrap(app)
 
-#Создаём класс формы с полями для ввода исходных файлов, полем для ввода коэфф. смешивания, капчей и кнопкой отправки формы
+
+# Создаём класс формы с полями для ввода исходных файлов, полем для ввода коэфф. смешивания, капчей и кнопкой отправки формы
 class NetForm(FlaskForm):
     upload_first = FileField('Load first image', validators=[FileRequired(),
                                                              FileAllowed(['jpg', 'jpeg'], 'jpg, jpeg only!')])
     upload_second = FileField('Load second image', validators=[FileRequired(),
                                                                FileAllowed(['jpg', 'jpeg'], 'jpg, jpeg only!')])
-    mix_ratio = FloatField('Mixing ratio (from 0 to 1)', validators=[NumberRange(min=0, max=1,
-                                                                                 message="Wrong value")])
+    mix_ratio = DecimalRangeField('Mixing ratio (from 0 to 1)', default=0)
     recaptcha = RecaptchaField()
     submit = SubmitField('send')
 
@@ -40,15 +42,18 @@ def main():
     gist_first, gist_second, gist_result = None, None, None
     mixing_ratio = 0.5
     if form.validate_on_submit():
-        #Сохранение загруженный пользователей изображений в папку static
+        #Сохранение загруженных пользователем изображений в папку static
         filename_first = './static/' + secure_filename(form.upload_first.data.filename)
         filename_second = './static/' + secure_filename(form.upload_second.data.filename)
         form.upload_first.data.save(filename_first)
         form.upload_second.data.save(filename_second)
+
         #Считывание коэфф. смешивания
-        mixing_ratio = form.mix_ratio.data
+        mixing_ratio = float(form.mix_ratio.data)
+
         #Смешивание двух изображений
         filename_result = utils.mix_photos([filename_first, filename_second], mixing_ratio)
+
         #Построение столбчатых диаграмм
         gist_first = utils.gist_colors(filename_first)
         gist_second = utils.gist_colors(filename_second)
